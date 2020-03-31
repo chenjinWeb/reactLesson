@@ -1,5 +1,5 @@
 /*-------------------------------------官方文档的HOOK:HOOK是16.8新增的特性,它可以在不写class的情况下使用state以及react其他特性-------------------------------------*/
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import ReactDOM from 'react-dom'
 
 // function Example () {
@@ -56,39 +56,91 @@ import ReactDOM from 'react-dom'
 // ReactDOM.render(<App />, document.querySelector("#root"))
 
 //监听页面大小变化
-function getSize () {
-  return {
-    innerHeight: window.innerHeight,
-    innerWidth: window.innerWidth,
-    outerHeight: window.outerHeight,
-    outerWidth: window.outerWidth
-  }
-}
+// function getSize () {
+//   return {
+//     innerHeight: window.innerHeight,
+//     innerWidth: window.innerWidth,
+//     outerHeight: window.outerHeight,
+//     outerWidth: window.outerWidth
+//   }
+// }
 
-function useWindowSize () {
-  const [windowSize, setWindowSize] = useState(getSize())
-  function handleResize () {
-    setWindowSize(getSize())
-  }
+// function useWindowSize () {
+//   const [windowSize, setWindowSize] = useState(getSize())
+//   function handleResize () {
+//     setWindowSize(getSize())
+//   }
+//   useEffect(() => {
+//     window.addEventListener('resize', handleResize)
+//     return () => {
+//       console.info('取消了监听事件')
+//       window.removeEventListener('resize', handleResize)
+//     }
+//   }, [])
+//   return windowSize
+// }
+
+// function App () {
+//   let result = useWindowSize()
+//   return <div>
+//     <p>页面的高度:{result.innerHeight}</p>
+//     <p>页面的宽度:{result.innerWidth}</p>
+//     <p>浏览器的高度:{result.outerHeight}</p>
+//     <p>浏览器的宽度:{result.outerWidth}</p>
+//   </div>
+// }
+// ReactDOM.render(<App />, document.querySelector("#root"))
+
+// const Child = ({ data }) => {
+//   console.info(data)
+//   const [name, setName] = useState(data)
+//   return (
+//     <div>
+//       <div>child</div>
+//       <div>{name} --- {data}</div>
+//     </div>
+//   )
+// }
+
+// const Hook = () => {
+//   console.log('Hook render...')
+//   const [count, setCount] = useState(0)
+//   const [name, setName] = useState('rose')
+//   return (
+//     <div>
+//       <div>
+//         {count}
+//       </div>
+//       <button onClick={() => setCount(count + 1)}>update count </button>
+//       <button onClick={() => setName('jack')}>update name </button>
+//       <Child data={name} />
+//     </div>
+//   )
+// }
+// ReactDOM.render(<Hook />, document.querySelector("#root"))
+
+const Hook = () => {
+  console.log('Hook render...')
+  const [count, setCount] = useState(0)
+  const btnRef = useRef(null)
   useEffect(() => {
-    window.addEventListener('resize', handleResize)
-    return () => {
-      console.info('取消了监听事件')
-      window.removeEventListener('resize', handleResize)
+    const onClick = () => {
+      setCount(count + 1)
     }
-  }, [])
-  return windowSize
+    const btnRefCurrent = btnRef.current
+    btnRefCurrent.addEventListener('click', onClick)
+    return () => {
+      btnRefCurrent.removeEventListener('click', onClick)
+    }
+  }, [count])
+  return (
+    <div>
+      <div>
+        {count}
+        <button ref={btnRef}>click me</button>
+      </div>
+    </div>
+  )
 }
-
-function App () {
-  let result = useWindowSize()
-  return <div>
-    <p>页面的高度:{result.innerHeight}</p>
-    <p>页面的宽度:{result.innerWidth}</p>
-    <p>浏览器的高度:{result.outerHeight}</p>
-    <p>浏览器的宽度:{result.outerWidth}</p>
-  </div>
-}
-ReactDOM.render(<App />, document.querySelector("#root"))
-
+ReactDOM.render(<Hook />, document.querySelector("#root"))
 
